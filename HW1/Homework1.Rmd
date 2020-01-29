@@ -1,0 +1,416 @@
+---
+title: "STAT115 Homework 1"
+author: ""
+date: "January 28, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)# please knit with `echo=TRUE, eval=TRUE`
+```
+
+
+# Part 0: Odyssey Signup
+
+Please fill out the Odyssey survey on Canvas so we can create an account for you. 
+
+# Part I: Introduction to R
+
+## Problem 1: Installation
+
+**Please install the following R/Bioconductor packages**
+
+```{r install, eval = FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install()
+BiocManager::install("sva")
+
+install.packages(c("ggplot2", "dplyr", "tidyr", "HistData", "mvtnorm",
+                   "reticulate"))
+```
+
+
+Please run this command to see if Bioconductor can work fine.
+
+```{r} 
+# please knit with this command echoed.
+BiocManager::valid() 
+```
+
+
+```{r libraries, message = FALSE}
+# these packages are needed for HW2
+# affy and affyPLM are needed to read the microarray data and run RMA
+library(sva) # for batch effect correction. Contains ComBat and sva.
+library(ggplot2) # for plotting
+library(dplyr) # for data manipulation
+library(reticulate) # needed to run python in Rstudio
+# these next two are not essential to this course
+library(mvtnorm) # need this to simulate data from multivariate normal
+library(HistData) # need this for data
+```
+
+When we grade, we should download their Rmd and knit it ourselves. They
+should have points removed if their document does not knit. On this HW,
+we will not take off points, but will warn them for next time.
+
+If they have hard-coded file names, we will warn them on this as well.
+
+## Problem 2: Getting help
+
+You can use the `mean()` function to compute the mean of a vector like
+so:
+
+```{r mean}
+x1 <- c(1:10, 50)
+mean(x1)
+```
+
+However, this does not work if the vector contains NAs:
+
+```{r mean-na}
+x1_na <- c(1:10, 50, NA)
+mean(x1_na)
+```
+
+**Please use R documentation to find the mean after excluding NA's (hint: `?mean`)**
+
+```{r problem2}
+# your code here
+```
+
+
+# Part II: Data Manipulation
+
+## Problem 3: Basic Selection
+
+In this question, we will practice data manipulation using a dataset
+collected by Francis Galton in 1886 on the heights of parents and their
+children. This is a very famous dataset, and Galton used it to come up
+with regression and correlation.
+
+The data is available as `GaltonFamilies` in the `HistData` package.
+Here, we load the data and show the first few rows. To find out more
+information about the dataset, use `?GaltonFamilies`.
+
+```{r loadGalton}
+data(GaltonFamilies)
+head(GaltonFamilies)
+```
+
+a. **Please report the height of the 10th child in the dataset.**
+
+```{r problem3a}
+# your code here
+```
+
+b. **What is the breakdown of male and female children in the dataset?**
+
+```{r problem3b}
+# your code here
+```
+
+c. **How many observations are in Galton's dataset? Please answer this
+question without consulting the R help.**
+
+```{r problem3c}
+# your code here
+```
+
+d. **What is the mean height for the 1st child in each family?**
+
+```{r problem3d}
+# your code here
+```
+
+e. **Create a table showing the mean height for male and female children.**
+```{r problem3e}
+# your code here
+```
+
+f. **What was the average number of children each family had?**
+
+```{r problem3f}
+# your code here
+```
+
+g. **Convert the children's heights from inches to centimeters and store
+it in a column called `childHeight_cm` in the `GaltonFamilies` dataset.
+Show the first few rows of this dataset.**
+
+```{r problem3g}
+# your code here
+```
+
+
+## Problem 4: Spurious Correlation
+
+```{r gen-data-spurious, cache = TRUE, eval=TRUE}
+# set seed for reproducibility
+set.seed(1234)
+N <- 25
+ngroups <- 100000
+sim_data <- data.frame(group = rep(1:ngroups, each = N),
+                       X = rnorm(N * ngroups),
+                       Y = rnorm(N * ngroups))
+```
+
+In the code above, we generate `r ngroups` groups of `r N` observations
+each. In each group, we have X and Y, where X and Y are independent
+normally distributed data and have 0 correlation.
+
+a. **Find the correlation between X and Y for each group, and display
+the highest correlations.**
+
+Hint: since the data is quite large and your code might take a few
+moments to run, you can test your code on a subset of the data first
+(e.g. you can take the first 100 groups like so):
+
+```{r subset}
+sim_data_sub <- sim_data %>% filter(group <= 100)
+```
+
+In general, this is good practice whenever you have a large dataset:
+If you are writing new code and it takes a while to run on the whole
+dataset, get it to work on a subset first. By running on a subset, you
+can iterate faster.
+
+However, please do run your final code on the whole dataset.
+
+```{r cor, cache = TRUE}
+# your code here
+```
+
+b. **The highest correlation is around 0.8. Can you explain why we see
+such a high correlation when X and Y are supposed to be independent and
+thus uncorrelated?**
+
+
+# Part III: Plotting
+
+## Problem 5
+
+**Show a plot of the data for the group that had the highest correlation
+you found in Problem 4.**
+
+```{r problem5}
+# your code here
+```
+
+Grading: 1pt.
+
+## Problem 6
+
+We generate some sample data below. The data is numeric, and has 3
+columns: X, Y, Z.
+
+```{r gen-data-corr}
+N <- 100
+Sigma <- matrix(c(1, 0.75, 0.75, 1), nrow = 2, ncol = 2) * 1.5
+means <- list(c(11, 3), c(9, 5), c(7, 7), c(5, 9), c(3, 11))
+dat <- lapply(means, function(mu)
+  rmvnorm(N, mu, Sigma))
+dat <- as.data.frame(Reduce(rbind, dat)) %>%
+  mutate(Z = as.character(rep(seq_along(means), each = N)))
+names(dat) <- c("X", "Y", "Z")
+```
+
+a. **Compute the overall correlation between X and Y.**
+
+```{r problem6a}
+# your code here
+```
+
+b. **Make a plot showing the relationship between X and Y. Comment on
+the correlation that you see.**
+
+```{r problem6b}
+# your code here
+```
+
+Your text answer here.
+
+c. **Compute the correlations between X and Y for each level of Z.**
+
+```{r problem6c}
+# your code here
+```
+
+d. **Make a plot showing the relationship between X and Y, but this
+time, color the points using the value of Z. Comment on the result,
+especially any differences between this plot and the previous plot.**
+
+```{r problem6d}
+# your code here
+```
+
+Your text answer here.
+
+
+# Part IV: Bash practices
+
+## Problem 7: Bash practices on Odyessy
+
+Please answer the following question using bash commands and include those in 
+your answer. Data are available at `/n/stats115/2020/HW1/public_MC3.maf`
+
+Mutation Annotation Format ([MAF](https://docs.gdc.cancer.gov/Data/File_Formats/MAF_Format/)) is a tab-delimited text file with aggregated mutation information. `public_MC3.maf`
+is a curated list of [somatic mutation](https://www.britannica.com/science/somatic-mutation) 
+occured in many patients. Since a complete MAF file contains far mroe 
+information than we need, in this problem we will focus on part of it.
+
+```
+Chromosome	Start_Position	Hugo_Symbol	Variant_Classification
+10	123810032	TACC2	Missense_Mutation
+10	133967449	JAKMIP3	Silent
+11	124489539	PANX3	Missense_Mutation
+11	47380512	SPI1	Missense_Mutation
+11	89868837	NAALAD2	Missense_Mutation
+11	92570936	FAT3	Silent
+12	107371855	MTERFD3	Missense_Mutation
+12	108012011	BTBD11	Missense_Mutation
+12	117768962	NOS1	5'Flank
+```
+
+In  `/n/stats115/2020/HW1/MC3/public_MC3.maf`, `Chromosome` and `Start_Position` 
+together specifies the genomics location where a location has happened. 
+`Hogo_symbol` is the overlapping gene of that location, and 
+`Variant_Classification` specifies how it influences downstream biological 
+processes, e.g. transcription and translation. We are interested to find out
+recurrent mutations with biological significance.
+
+Hint: In this exercise you might need to use `cut` and `sort` command. Please 
+try `man cut` and `man sort` to understand how it works. You might also 
+benefit if you use pipes `|`.
+
+a. How many lines are there in this file? How many times "KRAS" gene 
+has appeared?
+
+```{r engine="bash", eval=FALSE}
+# your bash command
+```
+
+b. How many unique `Variant_Classification` are there in the MAF? Please 
+count occurence of each type and sort them. Which one is the most frequent? 
+
+```{r engine="bash", eval=FALSE}
+# your bash command
+```
+
+c. What are the top FIVE most frequent genes? Please provide 
+the bash command and equivalent Python command. If you are a PI 
+looking for a gene to investigate (you need to find a gene with potentially 
+better biological significance), which gene out of the top 5 would you 
+choose? Why?
+
+```{r engine="bash", eval=FALSE}
+# your bash command
+```
+
+Equivalent python command:
+
+```{r engine="python", eval=FALSE}
+# your python command
+```
+
+Your text answer:
+
+d. Write a bash program that determines whether a user-input year ([YYYY]) is 
+a leap year or not (Definition: multiples of four with the exception of 
+centennial years not divisible by 400). The user-input can be either positional
+or interactive.
+
+```{r engine="bash", eval=FALSE}
+# your bash command
+```
+
+
+# Part V. High throughput sequencing read mapping
+
+We will give you a simple example to test high throughput sequencing
+alignment for RNA-seq data. Normally for paired-end sequencing data,
+each sample will have two separate FASTQ files, with line-by-line
+correspondence to the two reads from the same fragment. Read mapping
+could take a long time, so we have created just two FASTQ files of one
+RNA-seq sample with only 1M fragments (three 2 X 1M reads) for you to run STAR
+instead of the full data. The files are located at
+`/n/stat115/2020/HW1/loop/`. 
+
+```
+loop
+├── A_l.fastq
+├── A_r.fastq
+├── B_l.fastq
+├── B_r.fastq
+├── C_l.fastq
+└── C_r.fastq
+```
+
+Please include the commands that you used to run BWA and STAR in your
+answers.
+
+
+## Problem 8: BWA
+
+a. Use BWA (Li & Durbin, Bioinformatics 2009) to map the reads to the
+Hg38 version of the reference genome, available on Odyssey at
+`/n/stat115/2020/HW1/hg38.fasta`. 
+
+In `/n/stat115/2020/HW1/BWA/loop`, you are provided with three `.fastq` files/
+Write a for loop in bash to align the paired-end reads to the reference using 
+BWA on a compute node. Use the PE alignment mode and generate the output in 
+SAM format. Use SAMTools on the output to find out how many fragments are 
+mappable and uniquely mappable. How many rows are in each output SAM files?
+
+```{r engine="bash", eval=FALSE}
+# please copy your bash script here
+```
+
+Please provide text answer here.
+
+b. Use slurm to submit the same BWA alignment jobs onto cluster for `A_r.fastq` 
+and `A_l.fastq`. Please copy the content of your `sbatch` file here.
+
+```{r engine="bash", eval=FALSE}
+# please copy your sbatch file here
+```
+
+## Problem 9: STAR alignment
+
+a. Use STAR (Dobin et al, Bioinformatics 2012) to map the reads to the
+reference genome, available on Odyssey at
+`/n/stat115/2020/HW1/STARIndex`. Use the paired-end alignment mode and
+generate the output in SAM format for `A_r.fastq` 
+and `A_l.fastq` in `/n/stat115/2020/HW1/loop`. STAR should have a report.  
+How many fragments are mappable and how many are uniquely mappable?
+
+```{r engine="bash", eval=FALSE}
+# please copy your sbatch file here
+```
+
+b. If you are getting a different number of mappable fragments between
+BWA and STAR on the same data, why?
+
+
+Please provide text answer here.
+
+
+# Part VII: Dynamic programming with Python
+
+## Problem 10 Dyanic Programming
+
+Given a list of finite integer numbers: e.g. -2, 1, 7, -4, 5, 2, -3, -6, 4, 3, 
+-8, -1, 6, -7, -9, -5.
+Write a python script to maximize the Z where Z is the sum of the
+numbers from location X to location Y on this list. Be aware, your
+algorithm should look at each number ONLY ONCE from left to right.
+
+Hint: You can use dynamic programming to solve this problem with <20
+lines of codes.
+
+```{r engine="python", eval=FALSE}
+# your bash command
+```
+
+
