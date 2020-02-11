@@ -1,0 +1,224 @@
+---
+title: "STAT115 Homework 2"
+author: ''
+date: 'Due: Sunday, Feburary 23, 2020 at 11:59pm'
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE)# please knit with `echo=TRUE, eval=TRUE`
+```
+<br><br>
+
+# Part I: RNA-seq quality control
+For this question, we will examine a series of tools to perform essential quality-control analyses for high-throughput RNA sequencing data. 
+
+### Problem I.1 (3pts)
+**You are asked by a collaborator to analyze four RNA-seq libraries. She suspects that the libraries are generally of high-quality but is concerned that a sample may have been switched with her benchmates during processing. Execute FastQC, STAR, and RSeQC (tin.py) to determine whether any of the samples exhibit unusual quailty control metrics. Overall, identify the best and worst libraries. Your answer should provide evidence from all three tools. Include screen shots and tables as necessary as if you were delivering a report to the collaborator.**
+```
+Sequencing data:
+/n/stat115/2020/HW2/raw_data
+
+modules: fastqc/0.11.8-fasrc01, STAR/2.6.0c-fasrc01
+index: /n/stat115/2020/HW2/star_hg38_index
+bed: /n/stat115/2020/HW2/hg38_RefSeq.bed 
+```
+
+```
+Hint: not required but helpful to run STAR with these parameters:
+--outSAMtype BAM SortedByCoordinate 
+--readFilesCommand zcat
+```
+
+Student response
+<br>
+
+### Problem I.2 (0.5pt; graduate students only)
+
+**Your collaborator recalls that one of her samples was left on the bench for a couple of days before the full RNA-seq library was processed. Using the metrics from the question above, can you identify this sample? Provide your rationale.**
+
+Student response
+
+-----
+
+<br><br>
+
+# Part II: Pseudoalignment
+
+### Problem II.1 (1pt)
+**Process the 4 sequencing libraries with Salmon introduced in the previous question. Identify the transcript and gene with the highest expression in each library from the Salmon output.**
+
+```
+module: salmon/0.12.0-fasrc01
+index: /n/stat115/2020/HW2/salmon_hg38_index
+```
+
+Student response
+<br>
+
+### Problem II.2 (1pt)
+**Report the relative speed of Salmon and STAR for the analyses of these four samples. Comment on your results based on the lecture material.**
+
+```
+Hint: you can parse the times from log files or use the `time` tool in the command line...
+e.g. time sleep 2
+```
+
+Student response
+<br>
+
+### Problem II.3 (1pt; graduate students only)
+**Plot the relationship between effective length, normalized read counts, TPM, and FPKM for runX from the Salmon output. Comment on the relative utility of each metric when analyzing gene expression data.** 
+
+Student response
+
+-----
+
+<br><br>
+
+# Part III: Differential expression 
+
+In 2014, a controversial manuscript from Lin et al. argued that, based on RNA-seq of several tissues from both mouse and human, fundamental physiological differences existed between these two organisms. Here, we will investigate these claims for a subset of the data analyzed. (Note: a copy of this manuscript is included as the `part3_4-manuscript.pdf` file associated with this homework.) The provided data is a counts matrix of the samples with the following conventions:
+```
+row: <mouse>_<human> gene name (e.g. Stag2_STAG2)
+column: <organism>_<tissue>_<batch> sample identifier (e.g. human_adipose_3)
+```
+
+### Problem III.1 (1pt)
+**Perform a principle component analysis of the samples using the top 5,000 most variable genes as features. Indicate the species, tissue, and batch per sample plot. Do the results support the conclusions of the original paper? Do the results suggest the presence of a batch effect? **
+
+```{r import_piii, include=TRUE, echo=TRUE, eval = TRUE}
+
+# Import processed raw counts
+counts <- readRDS("../data/part3_counts.rds")
+
+# Perform a log TPM normalization
+log2tpm <- sapply(1:dim(counts)[2], function(idx){
+  log2((counts[,idx]/sum(counts[,idx]) * 1000000) + 1)
+})
+colnames(log2tpm) <- colnames(counts)
+
+# Continue analysis here.
+```
+
+Student response
+<br>
+
+### Problem III.2 (1pt)
+**Run COMBAT on the samples to remove the batch effect. Visualize the results using a similar principle component analysis as the question above. Provide evidence that the batch effects are successfully adjusted. Do these results change the primary interpretation of the results?**
+
+Student response
+<br>
+
+### Problem III.3 (1pts)
+**Run DESeq2 adjusting for the batch effect to identify differentially-expressed genes between the lung and adipose tissue. Report the number of statistically-significant genes as well as whether they are more highly expressed in either adipose tissue or lung tissue.**
+
+Student response
+<br>
+
+### Problem III.4 (1pts)
+**Identify the top 5 most differentially expressed genes that are overexpressed in each of the tissues. Comment on the biological relevance of these. It may be useful to use data from the GTEx consortium when interpreting your result.**
+
+```
+GTEx link: https://www.gtexportal.org/home
+```
+Student response
+<br>
+
+### Problem III.5 (1pts)
+**Visualize the differential gene expression values by making a volcano and an MA plot to summarize the differences between the two tissues. Be sure to use the `lfcShrink` function to get more robust estimates of the fold-changes for genes. **
+
+Student response
+<br>
+
+### Problem III.6 (1pts; graduate students only)
+**Rerun differential gene expression analyses without accounting for the batch effect. Compare the number of differentially expressed genes and anecdotes of top differentially expressed genes. Are the numbers of differentially expressed genes before/after the batch effect consistent with what you would have expected? Comment on the biological relevance of the top genes.** 
+
+Student response
+
+-----
+
+<br><br>
+
+# Part IV: Gene ontology
+
+While the previous question identified genes that were differentially expressed between tissues and specific anecdotes were used for interpretation, we often want to assesss the differences between samples using a more wholistic approach. Pathway enrichment analyses provide a statistically principled way of examining many differentially expressed genes in an effort to identify biological patterns that explain the results. These patterns are defined using prior biological knowledge. 
+
+### Problem IV.1 (1.5pts)
+
+**Run the up and down regulated genes computed in problem III.3 separately on DAVID (http://david.abcc.ncifcrf.gov/) to see whether these genes are enriched in specific biological process, pathways, etc. For example, consider reporting the enrichments for the top 100 genes in the KEGG pathways. If you were to summarize the results in a paper, how would you describe the systematic biologial features that are different between these tissues? Your analysis should comment on the stability of enriched pathways (with at least 2 different input gene list sizes) and attempt to interpret the results in the differential physiological properties of the tissues.**
+
+Student response
+
+### Problem IV.2 (0.5pts)
+
+**Describe in at least 3 but no more than 7 sentences the methodological differences between how approaches like DAVID and approaches like GSEA work in identifying enriched pathways from RNA-seq data.**
+
+Student response
+
+### Problem IV.3 (1pt; graduate students only)
+**Run Gene Set Enrichment analysis (http://www.broadinstitute.org/gsea/index.jsp) using the summary statistics from problem III.3. What are the gene sets or experiments that best capture the differential expression data between these two cell types? Comment on the biological relevance of the results and compare them to the results produced from the DAVID analysis.**
+
+```
+Hint: the fgsea package (https://bioconductor.org/packages/release/bioc/html/fgsea.html)
+is, in my hands, easier to use than the original java distribution of gsea
+```
+
+Student response
+
+-----
+
+<br><br>
+
+# Part V: Python programming
+
+### Problem V.1 (2pts)
+
+**RSeQC on RNA-seq generates many output files. One such file is called geneBodyCoverage.r which contains normalized reads mapped to each % of gene / transcript body. Suppose that we want to visualize all 12 samples from a recent RNA-seq library together to quickly perform quality control. These data files are present in the `part5` folder. Write a python program to extract the values and name from each file. The same script should then draw the gene body coverage for all the samples (3 rows x 4 cols) in one figure. We provide an example with 3 x 2 samples in one figure. Include your code and final figure in your report.**
+
+Student response
+
+-----
+
+<br><br>
+
+# Part VI: Batch effects and classification in the literature
+
+In a recent manuscript (published September 2019), Zhou et al. describe a modified version of RNA-seq called SILVER-seq that enables profiling of extracellular RNAs (exRNAs). The manuscript reports impressive performance in classifying patients with breast cancer compared to healthy controls as well as whether the cancer was recurrent. About three weeks ago, the original findings were challenged by Hartl and Gao where they argued that a batch effect confounded the interpretation of the work. The authors then rebutted the challenge. 
+
+### Problem VI.1 (1 pts)
+**In the main manuscript (see `1_original.pdf`), what bioinformatics methods were used in conjuction with the SILVER-seq protocol to predict patient status? Name the methods and describe their purpose (list at least 3).**
+
+Student response
+
+<br>
+
+-----
+The next questions are for graduate students only. In 3-5 sentences each, answer the following questions related to the short letters that comment on the manuscript.
+
+### Problem VI.2 (0.5 pts; graduate students only)
+**Briefly summarize the Hartl and Gao response (see `2_Hartl_response.pdf`). Specifically, what evidence do Hartl and Gao offer that the interpretation of the original manuscript may be confounded by a batch effect? If you were the bioinformatician analyzing the original data, what steps, if any, could you take to eliminate the batch effect?**
+
+Student response
+
+### Problem VI.3 (0.5 pts; graduate students only)
+**Summarize the response to Hartl (see `3_response_to_Hartl.pdf`). Specifically, how do the original authors argue that there is "a lack of between batch differences"? Do you find their rebuttal convincing?**
+
+Student response
+
+### Problem VI.4 (0.5 pts; graduate students only)
+**Design a modified version of the study that utilizes both proper experimental setup and computational tools discussed in this lab/homework that would ameloirate the potential batch effect in assessing the efficacy of SILVER-seq. Comment specifically on batch design and analytical methods. Assume that you want to test the same number of samples (~130) but no more than 10 samples can be processed per batch.**
+
+Student response
+
+### Problem VI.5 (0.0 pts; graduate students only)
+**After reading the primary manuscript and both responses, how do you interpret the efficacy of SILVER-seq as a tool for cancer diagnostics/prediction? What remaining questions do you think need to be answered before this technology could be confidently used with patients?**
+
+Optional response (feedback will be given but students will not receive points.)
+
+
+**Note:** you can access the raw SILVER-seq data from this study here: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE131512
+
+<br><br>
