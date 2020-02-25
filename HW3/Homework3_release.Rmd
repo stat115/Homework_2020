@@ -161,7 +161,7 @@ https://support.10xgenomics.com/single-cell-gene-expression/datasets/3.0.2/5k_pb
 ```
 
 
-### 9. Clustering: Use resolution = 0.2 to cluster the cells. How many clusters to you get and how many cells are assigned to each cluster? Use Seurat to calculate differential expression between clusters (one vs the rest), identify putative biomarkers for each cell subpopulation. Visualize the gene expression values of these potential markers on your UMAP plots. 
+### 9. Clustering: Use resolution = 0.6 to cluster the cells. How many clusters to you get and how many cells are assigned to each cluster? Use Seurat to calculate differential expression between clusters (one vs the rest), identify putative biomarkers for each cell subpopulation. Visualize the gene expression values of these potential markers on your UMAP plots. 
 
 ```{r}
 # your code here
