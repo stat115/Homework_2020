@@ -131,7 +131,7 @@ https://support.10xgenomics.com/single-cell-gene-expression/datasets/3.0.2/5k_pb
 ```
 
 
-### 5. For GRADUATE students: Sometimes scRNA-seq data might have significant PCs that are heavily weighted by cell cycle genes, which need to be removed before downstream analyses. Check the top PCs in this data to see whether cell cycle components need to be removed. Provide plots and other quantitative arguments to support your case. 
+### 5. Sometimes scRNA-seq data might have significant PCs that are heavily weighted by cell cycle genes, which need to be removed before downstream analyses. Check the top PCs in this data to see whether cell cycle components need to be removed. Provide plots and other quantitative arguments to support your case. 
 
 
 ```{r}
