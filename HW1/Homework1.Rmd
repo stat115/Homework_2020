@@ -1,18 +1,18 @@
 ---
 title: "STAT115 Homework 1"
 author: ""
-date: "January 28, 2020"
+date: "February 10, 2020"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, eval = FALSE)# please knit with `echo=TRUE, eval=TRUE`
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE)
 ```
 
 
 # Part 0: Odyssey Signup
 
-Please fill out the Odyssey survey on Canvas so we can create an account for you. 
+Please fill out the Odyssey survey on Canvas so we can create an account for you
 
 # Part I: Introduction to R
 
@@ -31,10 +31,9 @@ install.packages(c("ggplot2", "dplyr", "tidyr", "HistData", "mvtnorm",
 ```
 
 
-Please run this command to see if Bioconductor can work fine.
+Please run this command (use `eval=TRUE`) to see if Bioconductor can work fine.
 
-```{r} 
-# please knit with this command echoed.
+```{r, eval=FALSE}
 BiocManager::valid() 
 ```
 
@@ -51,11 +50,6 @@ library(mvtnorm) # need this to simulate data from multivariate normal
 library(HistData) # need this for data
 ```
 
-When we grade, we should download their Rmd and knit it ourselves. They
-should have points removed if their document does not knit. On this HW,
-we will not take off points, but will warn them for next time.
-
-If they have hard-coded file names, we will warn them on this as well.
 
 ## Problem 2: Getting help
 
@@ -80,6 +74,10 @@ mean(x1_na)
 # your code here
 ```
 
+
+Grading: Grade on correctness.
+
++ 0.5pt
 
 # Part II: Data Manipulation
 
@@ -111,7 +109,7 @@ b. **What is the breakdown of male and female children in the dataset?**
 # your code here
 ```
 
-c. **How many observations are in Galton's dataset? Please answer this
+c. **How many observations (number of rows) are in Galton's dataset? Please answer this
 question without consulting the R help.**
 
 ```{r problem3c}
@@ -144,6 +142,7 @@ Show the first few rows of this dataset.**
 ```
 
 
+
 ## Problem 4: Spurious Correlation
 
 ```{r gen-data-spurious, cache = TRUE, eval=TRUE}
@@ -168,7 +167,6 @@ moments to run, you can test your code on a subset of the data first
 (e.g. you can take the first 100 groups like so):
 
 ```{r subset}
-sim_data_sub <- sim_data %>% filter(group <= 100)
 ```
 
 In general, this is good practice whenever you have a large dataset:
@@ -185,6 +183,14 @@ However, please do run your final code on the whole dataset.
 b. **The highest correlation is around 0.8. Can you explain why we see
 such a high correlation when X and Y are supposed to be independent and
 thus uncorrelated?**
+
+Because we cherrypicked the highest correlations among 100,000
+correlations, it is just by chance that we found a few with such
+a high correlation. We can see in the histogram below that most of
+the correlations are around the expected value of 0.
+
+```{r cor-hist, eval=F}
+```
 
 
 # Part III: Plotting
@@ -231,6 +237,8 @@ the correlation that you see.**
 
 Your text answer here.
 
+The correlation between X and Y is negative.
+
 c. **Compute the correlations between X and Y for each level of Z.**
 
 ```{r problem6c}
@@ -253,12 +261,15 @@ Your text answer here.
 ## Problem 7: Bash practices on Odyessy
 
 Please answer the following question using bash commands and include those in 
-your answer. Data are available at `/n/stats115/2020/HW1/public_MC3.maf`
+your answer. Data are available at `/n/stat115/2020/HW1/public_MC3.maf`
 
-Mutation Annotation Format ([MAF](https://docs.gdc.cancer.gov/Data/File_Formats/MAF_Format/)) is a tab-delimited text file with aggregated mutation information. `public_MC3.maf`
-is a curated list of [somatic mutation](https://www.britannica.com/science/somatic-mutation) 
-occured in many patients. Since a complete MAF file contains far mroe 
-information than we need, in this problem we will focus on part of it.
+Mutation Annotation Format ([MAF](https://docs.gdc.cancer.gov/Data/File_Formats/MAF_Format/)) 
+is a tab-delimited text file with aggregated mutation information. 
+MC3.maf `/n/stat115/2020/HW1/public_MC3.maf` is a curated list of [somatic mutation](https://www.britannica.com/science/somatic-mutation) 
+occured in many patients with different types of cancers from TCGA.
+
+Since a complete MAF file contains far more information than we need, 
+in this problem we will focus on part of it.
 
 ```
 Chromosome	Start_Position	Hugo_Symbol	Variant_Classification
@@ -277,26 +288,34 @@ In  `/n/stats115/2020/HW1/MC3/public_MC3.maf`, `Chromosome` and `Start_Position`
 together specifies the genomics location where a location has happened. 
 `Hogo_symbol` is the overlapping gene of that location, and 
 `Variant_Classification` specifies how it influences downstream biological 
-processes, e.g. transcription and translation. We are interested to find out
-recurrent mutations with biological significance.
+processes, e.g. transcription and translation.
 
-Hint: In this exercise you might need to use `cut` and `sort` command. Please 
-try `man cut` and `man sort` to understand how it works. You might also 
-benefit if you use pipes `|`.
+Please include your bash commands and the full output from bash console 
+with text answer to the questions.
 
-a. How many lines are there in this file? How many times "KRAS" gene 
-has appeared?
 
-```{r engine="bash", eval=FALSE}
-# your bash command
+a. How many lines are there in this file? How many times "KRAS" gene has emerged?
+
+```{r q7a, engine="bash", eval = FALSE}
+# your bash code here
+```
+
+```
+your bash output here
 ```
 
 b. How many unique `Variant_Classification` are there in the MAF? Please 
 count occurence of each type and sort them. Which one is the most frequent? 
 
-```{r engine="bash", eval=FALSE}
-# your bash command
+```{r q7b, engine="bash", eval = FALSE}
+# your bash code here
 ```
+
+```
+your bash output here
+```
+
+Your text answer:
 
 c. What are the top FIVE most frequent genes? Please provide 
 the bash command and equivalent Python command. If you are a PI 
@@ -304,26 +323,38 @@ looking for a gene to investigate (you need to find a gene with potentially
 better biological significance), which gene out of the top 5 would you 
 choose? Why?
 
-```{r engine="bash", eval=FALSE}
-# your bash command
+```{r q7c, engine="bash", eval = FALSE}
+# your bash code here
+```
+
+```
+your bash output here
 ```
 
 Equivalent python command:
 
-```{r engine="python", eval=FALSE}
-# your python command
+```{r q7cpy, engine="python", eval=FALSE}
+# your python command here
 ```
 
-Your text answer:
+```
+your python output here
+```
+
+Yor text answer:
+
 
 d. Write a bash program that determines whether a user-input year ([YYYY]) is 
-a leap year or not (Definition: multiples of four with the exception of 
-centennial years not divisible by 400). The user-input can be either positional
-or interactive.
+a leap year or not (all years that are multiples of four. If the year is 
+centennial and not divisible by 400, then it is not a leap year). 
+The user input can be either positional or interactive. 
+Please include the content of your shell script here and test on 
+1900/2000/2002, does your code run as expected?
 
-```{r engine="bash", eval=FALSE}
-# your bash command
+```{r q7d, engine="bash", eval = FALSE}
+# your bash code here
 ```
+
 
 
 # Part V. High throughput sequencing read mapping
@@ -333,19 +364,11 @@ alignment for RNA-seq data. Normally for paired-end sequencing data,
 each sample will have two separate FASTQ files, with line-by-line
 correspondence to the two reads from the same fragment. Read mapping
 could take a long time, so we have created just two FASTQ files of one
-RNA-seq sample with only 1M fragments (three 2 X 1M reads) for you to run STAR
+RNA-seq sample with only 3M fragments (2 * 3M reads) for you to run STAR
 instead of the full data. The files are located at
-`/n/stat115/2020/HW1/loop/`. 
-
-```
-loop
-├── A_l.fastq
-├── A_r.fastq
-├── B_l.fastq
-├── B_r.fastq
-├── C_l.fastq
-└── C_r.fastq
-```
+`/n/stat115/2020/HW1`. The mapping will generate one single output
+file. Make sure to use the right parameters for single-end (SE) vs
+paired-end (PE) modes in BWA and STAR.
 
 Please include the commands that you used to run BWA and STAR in your
 answers.
@@ -353,64 +376,76 @@ answers.
 
 ## Problem 8: BWA
 
-a. Use BWA (Li & Durbin, Bioinformatics 2009) to map the reads to the
+1. Use BWA (Li & Durbin, Bioinformatics 2009) to map the reads to the
 Hg38 version of the reference genome, available on Odyssey at
-`/n/stat115/2020/HW1/hg38.fasta`. 
+`/n/stat115/HW2_2019/bwa_hg38_index/hg38.fasta`. In 
+`/n/stat115/HW1_2020/BWA/loop`, you are provided with three `.fastq` 
+files with following structure (`A_l` and `A_r` are paired sequencing reads 
+from sample_A). Write a for loop in bash to align reads to the reference 
+using BWA PE mode and geneterate output in SAM format.
 
-In `/n/stat115/2020/HW1/BWA/loop`, you are provided with three `.fastq` files/
-Write a for loop in bash to align the paired-end reads to the reference using 
-BWA on a compute node. Use the PE alignment mode and generate the output in 
-SAM format. Use SAMTools on the output to find out how many fragments are 
-mappable and uniquely mappable. How many rows are in each output SAM files?
+How many rows are in each output `.sam` files? Use SAMTools on the output
+to find out how many reads are mappable and uniquely mappable 
+(please also calculate the ratio). Please include full samtools output 
+and text answer.
 
-```{r engine="bash", eval=FALSE}
-# please copy your bash script here
+
+```{r 8, engine="bash", eval = FALSE}
+# please provide the content of your sbatch script (including the header)
 ```
 
-Please provide text answer here.
-
-b. Use slurm to submit the same BWA alignment jobs onto cluster for `A_r.fastq` 
-and `A_l.fastq`. Please copy the content of your `sbatch` file here.
-
-```{r engine="bash", eval=FALSE}
-# please copy your sbatch file here
 ```
+samtools output
+```
+
+You text answer
 
 ## Problem 9: STAR alignment
 
-a. Use STAR (Dobin et al, Bioinformatics 2012) to map the reads to the
+1. Use STAR (Dobin et al, Bioinformatics 2012) to map the reads to the
 reference genome, available on Odyssey at
-`/n/stat115/2020/HW1/STARIndex`. Use the paired-end alignment mode and
-generate the output in SAM format for `A_r.fastq` 
-and `A_l.fastq` in `/n/stat115/2020/HW1/loop`. STAR should have a report.  
-How many fragments are mappable and how many are uniquely mappable?
+`/n/stat115/HW1_2020/STARIndex`. Use the paired-end alignment mode and
+generate the output in SAM format. Please include full STAR report.  
+How many reads are mappable and how many are uniquely mappable?
 
-```{r engine="bash", eval=FALSE}
-# please copy your sbatch file here
+```{r 9, engine="bash", eval = FALSE}
+# please provide the content of your sbatch script (including the header)
 ```
 
-b. If you are getting a different number of mappable fragments between
+```
+Log file from STAR
+```
+Yor text answer here.
+
+
+2. If you are getting a different number of mappable fragments between
 BWA and STAR on the same data, why?
 
-
-Please provide text answer here.
+Your text answer here.
 
 
 # Part VII: Dynamic programming with Python
 
-## Problem 10 Dyanic Programming
+## Problem 10 
 
-Given a list of finite integer numbers: e.g. -2, 1, 7, -4, 5, 2, -3, -6, 4, 3, 
--8, -1, 6, -7, -9, -5.
+Given a list of finite integer numbers, 
 Write a python script to maximize the Z where Z is the sum of the
 numbers from location X to location Y on this list. Be aware, your
 algorithm should look at each number ONLY ONCE from left to right.
+Your script should return three values: the starting index location X, 
+the ending index location Y, and Z, the sum of numbers between index 
+X and Y (inclusive).
 
-Hint: You can use dynamic programming to solve this problem with <20
-lines of codes.
+For example, if A=[-2, 1, 7, -4, 5, 2, -3, -6, 4, 3, -8, -1, 6, -7, -9, -5], 
+your program should return (start_index = 1, end_index = 5, sum = 11) 
+corresponding to [1, 7, -4, 5, 2].
 
-```{r engine="python", eval=FALSE}
-# your bash command
+Please test your program with this example and see if you can get the 
+correct numbers.
+
+Hint: Consider dynamic programming.
+
+```{python dynamic-programming, eval=TRUE, echo = TRUE}
+
 ```
-
 

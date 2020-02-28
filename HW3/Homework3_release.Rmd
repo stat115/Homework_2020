@@ -1,0 +1,177 @@
+---
+title: "Homework 3"
+author: "qing zhang"
+date: "February 23, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE, message = FALSE)
+```
+
+Spring 2020 STAT115/215 BIO/BST282
+Due: 3/8/2020 midnight
+
+# HOMEWORK 3: Classification and scRNA-seq
+
+## Part I: Sample classification
+
+We provide you z-score normalized expression data of 50 breast tumor samples, 50 normal breast samples (your training and cross-validation data), and 20 samples without diagnosis (your testing data). We want to use the 100 samples with known diagnosis to train machine learning models in order to predict the 20 unknown samples. 
+
+You will need the following libraries in R: `ggplot2` and `ggfortify` for plotting, `MASS` and `caret` for machine learning, and `pROC` is for evaluating testing performance. The [YouTube video on caret](https://youtu.be/z8PRU46I3NY) and the [package documentation](http://topepo.github.io/caret/index.html) might be helpful.
+
+```{r prepare}
+library(ggplot2)
+library(ggfortify)
+library(pROC)
+library(caret)
+library(e1071) # KNN
+library(kernlab) #SVM
+
+#### read in data for question 1
+dataset <- read.table(file = "q1_data/BRCA_zscore_data.txt", sep = "\t", header = TRUE, row.names = 1)
+phenotype <- read.table(file = "q1_data/BRCA_phenotype.txt",sep = "\t", header = TRUE, row.names = 1)
+phenotype <- as.character(phenotype[rownames(dataset),'phenotype'])
+```
+
+
+### 1. Run PCA for dimension reduction on the 100 samples with known labels, and draw these 100 samples in a 2D plot. Do cancer and normal separate from the first two PCs? Would this be sufficient to classify the unknown samples?
+
+
+```{r}
+# your code here
+```
+
+
+### 2. Draw a plot showing the cumulative % variance captured from the top 100 PCs. How many PCs are needed to capture 90% of the variance? 
+
+
+```{r}
+# your code here
+```
+
+
+### 3. Apply machine learning methods (KNN, logistic regression, Ridge regression, LASSO, ElasticNet, random forest, and support vector machines) on the top 25 PCs of the training data and 5-fold cross validation to classify the samples. `caret` and `MASS` already implemented all of the machine learning methods, including cross-validation. In order to get consistent results from different runs, use `set.seed(115)` right before each `train` command. 
+
+```{r}
+# your code here
+```
+
+### 4. Summarize the performance of each machine learning method, in terms of accuracy and kappa. 
+
+```{r}
+# your code here
+```
+
+
+### 5. For Graduate students: Compare the performance difference between logistic regression, Ridge, LASSO, and ElasticNet. In LASSO, how many PCs have non-zero coefficient? In ElasticNet, what is the lamda for Ridge and LASSO, respectively? 
+
+```{r}
+# your code here
+```
+
+
+### 6. Use the PCA projections in Q1 to obtain the first 25 PCs of the 20 unknown samples. Use one method that performs well in Q4 to make predictions. Caret already used the hyper-parameters learned from cross-validation to train the parameters of each method on the full 100 training data. You just need to call this method to make the predictions. 
+
+```{r}
+# your code here
+```
+
+
+### 7. For Graduate students: Can you find out the top 3 genes that are most important in this prediction method in Q6? Do they have some known cancer relevance? 
+
+```{r}
+# your code here
+```
+
+
+### 8. Suppose a pathologist later made diagnosis on the 20 unknown samples (load the diagnosis.txt file). Based on this gold standard, draw an ROC curve of your predictions in Q6. What is the prediction AUC? 
+
+```{r}
+# your code here
+```
+
+
+## Part II. Single cell RNA-seq 
+
+For this exercise, we will be analyzing a single cell RNA-Seq dataset of human peripheral blood mononuclear cells (PBMC) from 10X Genomics (droplet-based) from a healthy donor (Next GEM). The raw data can be found below which is already processed by CellRanger into the expression matrix format. 
+
+https://support.10xgenomics.com/single-cell-gene-expression/datasets/3.0.2/5k_pbmc_v3_nextgem
+
+
+### 1. Load data: Read the 10X data and create a Seurat (Butler et al., Nature Biotechnology 2018) Object. Please report number of cells, number of genes, and dropout rate.
+
+```{r}
+# your code here
+```
+
+
+### 2. QC genes: We want to filter genes that are detected in very few cells. Let’s keep all genes expressed in >= 10 cells. How do the above summary statistics change after filtering?
+
+```{r}
+# your code here
+```
+
+
+### 3. QC cells: Next we will filter cells with high proportion of mitochondrial reads (potential dead cells) or outlier number of genes (potential poor reactions or multiplets). What proportion of the counts from your filtered dataset map to mitochondrial genes? Remove those cells with high mitochondrial rate (> 5%). Outlier cells with extremely high or low gene coverage should be removed, and the cutoff depends on the scRNA-seq technology and the distribution of each dataset. What is the distribution of number of genes and UMIs in your dataset? Let’s filter cells with > 1 stdev of covered genes from the average.  Keep the remaining cells for downstream analysis.
+
+
+```{r}
+# your code here
+```
+
+
+### 4. Dimension reduction: Use global-scaling normalization method in Seurat with the scaling factor 10000, so all the cells will be normalized to have the same sequencing depth to 10K. Use the Seurat function "FindVariableGenes" to select 2000 genes (by default) showing expression variability, then perform PCA on these genes. Provide summary plots, statistics, and tables to show 
+- How many PCs are statistically significant?
+- The top 5 genes with the most positive and negative coefficients in each of the significant PCs,
+- How much variability is explained in each of the significant PCs.
+
+```{r}
+# your code here
+```
+
+
+### 5. Sometimes scRNA-seq data might have significant PCs that are heavily weighted by cell cycle genes, which need to be removed before downstream analyses. Check the top PCs in this data to see whether cell cycle components need to be removed. Provide plots and other quantitative arguments to support your case. 
+
+
+```{r}
+# your code here
+```
+
+
+### 6. Visualization: Use Seurat to run UMAP on the top 20 PCs (regardless of how many PCs are statistically significant) from Q4. Visualize the cells and their UMAP coordinates and comment on the number of cell clusters that appear on this data. Describe the difference between PCA and UMAP on 2D plots?
+
+```{r}
+# your code here
+```
+
+
+### 7. For GRADUATE students: Use Seurat to run tSNE on the top 20 PCs (regardless of how many PCs are statistically significant) from Q4. Comments on the difference between tSNE and UMAP runtime and results.
+
+```{r}
+# your code here
+```
+
+
+### 8. For GRADUATE students: Try different `resolution` in clustering and draw the resulting clusters in different colors on UMAP. How does resolution influence the number of clusters and the number of cells assigned to each cluster?
+
+
+```{r}
+# your code here
+```
+
+
+### 9. Clustering: Use resolution = 0.6 to cluster the cells. How many clusters to you get and how many cells are assigned to each cluster? Use Seurat to calculate differential expression between clusters (one vs the rest), identify putative biomarkers for each cell subpopulation. Visualize the gene expression values of these potential markers on your UMAP plots. 
+
+```{r}
+# your code here
+```
+
+
+### 10. Annotation: For GRADUATE students: Based on the expression characteristics of your cell clusters, provide putative biological annotation (e.g. MS4A1, CD79A genes are high in B-cells) for the clusters. This paper (Newman et al, Nat Methods 2015, https://www.nature.com/articles/nmeth.3337) may serve as a good resource as well as this tutorial PBMC (https://satijalab.org/seurat/pbmc3k_tutorial.html). 
+
+
+```{r}
+# your code here
+```
+
