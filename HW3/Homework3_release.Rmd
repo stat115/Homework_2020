@@ -1,6 +1,6 @@
 ---
 title: "Homework 3"
-author: "qing zhang"
+author: ""
 date: "February 23, 2020"
 output: html_document
 ---
@@ -31,7 +31,7 @@ library(kernlab) #SVM
 #### read in data for question 1
 dataset <- read.table(file = "q1_data/BRCA_zscore_data.txt", sep = "\t", header = TRUE, row.names = 1)
 phenotype <- read.table(file = "q1_data/BRCA_phenotype.txt",sep = "\t", header = TRUE, row.names = 1)
-phenotype <- as.character(phenotype[rownames(dataset),'phenotype'])
+phenotype <- as.character(phenotype[rownames(dataset),'phenotype']) # the labels
 ```
 
 
@@ -71,7 +71,7 @@ phenotype <- as.character(phenotype[rownames(dataset),'phenotype'])
 ```
 
 
-### 6. Use the PCA projections in Q1 to obtain the first 25 PCs of the 20 unknown samples. Use one method that performs well in Q4 to make predictions. Caret already used the hyper-parameters learned from cross-validation to train the parameters of each method on the full 100 training data. You just need to call this method to make the predictions. 
+### 6. Use the PCA projections in Q1 to obtain the first 25 PCs of the 20 unknown samples. Use one method that performs well in Q4 to make predictions for unknown sampels (`q1_data/unknown_samples.txt`). Caret already used the hyper-parameters learned from cross-validation to train the parameters of each method on the full 100 training data. You just need to call this method to make the predictions. 
 
 ```{r}
 # your code here
@@ -85,7 +85,7 @@ phenotype <- as.character(phenotype[rownames(dataset),'phenotype'])
 ```
 
 
-### 8. Suppose a pathologist later made diagnosis on the 20 unknown samples (load the diagnosis.txt file). Based on this gold standard, draw an ROC curve of your predictions in Q6. What is the prediction AUC? 
+### 8. Suppose a pathologist later made diagnosis on the 20 unknown samples (load the `q1_data/diagnosis.txt` file). Based on this gold standard, draw an ROC curve of your predictions in Q6. What is the prediction AUC? 
 
 ```{r}
 # your code here
@@ -98,6 +98,7 @@ For this exercise, we will be analyzing a single cell RNA-Seq dataset of human p
 
 https://support.10xgenomics.com/single-cell-gene-expression/datasets/3.0.2/5k_pbmc_v3_nextgem
 
+Please provide code and text answer for each question.
 
 ### 1. Load data: Read the 10X data and create a Seurat (Butler et al., Nature Biotechnology 2018) Object. Please report number of cells, number of genes, and dropout rate.
 
@@ -131,7 +132,7 @@ https://support.10xgenomics.com/single-cell-gene-expression/datasets/3.0.2/5k_pb
 ```
 
 
-### 5. Sometimes scRNA-seq data might have significant PCs that are heavily weighted by cell cycle genes, which need to be removed before downstream analyses. Check the top PCs in this data to see whether cell cycle components need to be removed. Provide plots and other quantitative arguments to support your case. 
+### 5. For GRADUATE students: Sometimes scRNA-seq data might have significant PCs that are heavily weighted by cell cycle genes, which need to be removed before downstream analyses. Check the top PCs in this data to see whether cell cycle components need to be removed. Provide plots and other quantitative arguments to support your case. 
 
 
 ```{r}
@@ -175,3 +176,8 @@ https://support.10xgenomics.com/single-cell-gene-expression/datasets/3.0.2/5k_pb
 # your code here
 ```
 
+## Rules for submitting the homework:
+
+Please submit your solution directly on the canvas website. Please provide both your code in this Rmd document and an html file for your final write-up. Please pay attention to the clarity and cleanness of your homework.
+
+The teaching fellows will grade your homework and give the grades with feedback through canvas within one week after the due date. Some of the questions might not have a unique or optimal solution. TFs will grade those according to your creativity and effort on exploration, especially in the graduate-level questions.
