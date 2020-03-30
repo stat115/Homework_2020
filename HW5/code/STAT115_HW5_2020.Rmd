@@ -1,0 +1,105 @@
+---
+title: "STAT 115 Homework 5"
+author: "(your name)"
+date: "Due: Sunday 4/12/2020 by 11:59 pm"
+output: html_document
+---
+
+# Part I. Hidden Markov Model and TAD boundaries
+
+Topologically associating domains (TADs) define genomic intervals, where sequences within a TAD physically interact more frequently with each other than with sequences outside the TAD. TADs are often defined by HiC (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3149993/), an experimental technique designed to study the three-dimensional architecture of genomes. HiC generates PE sequenced data, where the two mate pairs indicate two genomic regions that are might be far apart in the genome, but physically interact with each other. If we look across the genome in bins (40kb in the early paper, but now can go down to 5-10kb with deeper sequencing), we could find reads that are mapped there and check whether their interacting mate pairs are mapped upstream or downstream. In each bin, we can calculate a directional index (DI) to quantify the degree of upstream or downstream bias of a given bin (for more details, see the supplement- `Supplement_10.1038_nature11082.pdf` ). For this HW, we ask you to implement a hidden Markov Model (Viterbi) to find regions with upstream bias (DI < 0) and those with downstream bias (DI > 0), even though the DI in individual bins might have some noise. This way, TAD boundaries could be discovered as clusters of bins from negative DIs to positive DIs (see Supplementary Figure 12b). 
+
+For simplicity, we will only have two hidden states (upstream, downstream), and use the following HMM parameters (these do not necessarily capture the real data distribution, but just to help your implementation): 
+
+```
+Initial probability: upstream = 0.5, downstream = 0.5
+Transition probability: Pb(up to up) = Pb(dn to dn) = 0.9, Pb(up to dn) = Pb(dn to up) = 0.1
+Emission probability: 4% < -1200, 10% [-1200, -600), 20% [-600, -300), 40% [-500, 0), 6% >= 0.
+Upstream: 4% > 1200, 8% (800, 1200], 15% (500, 800], 65% (0, 500), 8% <= 0.
+Downstream: 4% > 1200, 8% (800, 1200], 15% (500, 800], 65% (0, 500), 8% <= 0.
+```
+
+#### I.1 Given the DI file (`HW5_ESC.Dixon_2015.DI.chr21.txt`), implement and utilize the Viterbi algorithm to predict the hidden states of the HiC data. Report the putative TAD boundries from this analysis. 
+
+Hint: Examples HMM code can be found at: 
+http://www.adeveloperdiary.com/data-science/machine-learning/implement-viterbi-algorithm-in-hidden-markov-model-using-python-and-r/
+
+
+```{r}
+# your code here
+```
+
+# Part II. Single cell ATAC-seq
+
+For this exercise, we will be analyzing a single cell ATAC-Seq dataset of human peripheral blood mononuclear cells (PBMC) from the 10X Genomics platform. There are around 5,000 single cells that were sequenced on the Illumina NovaSeq. The raw data can be found at: https://support.10xgenomics.com/single-cell-atac/datasets/1.2.0/atac_pbmc_5k_v1. A processed Seurat scRNA-seq object used in the lab will be reused for the assignment and is available here: https://github.com/stat115/Lab_2020/blob/master/Lab09/scrna_source/output/PBMC5k_scRNAseq-for-integration.rds.
+
+
+#### II.1 Read the 10X data and create a Seurat object that stores the reads in peaks count matrix. Filter cells with fewer than 5000 counts (from the `passed_filters` variable) How many cells are retained and how many are excluded? 
+
+
+#### II.2 Quantify the gene activity for each cell using the `FeatureMatrix` function from Signac. Include your code below.
+
+
+#### II.3 Process the gene activity matrix by scaling and normalizing using Signac (`NormalizeData()`)
+
+
+#### II.4 Process the peak matrix. a) Perform latent semantic indexing (LSI) to reduce the dimensionality of the scATAC-seq data. Reduce the dimension to 50. b) Run UMAP on the first 20 dimensions but excluding the first component. c) Cluster all the cells using `resolution = 0.6` and visualize these clusters on a UMAP embedding. Comment on why we recommended excluding the first LSI component.
+
+
+#### II.5 Read the pre-processed and clustered scRNA-seq dataset, which is provided as part of the homework and was generated for the lab. Then identify anchors between the scATAC-seq dataset and the scRNA-seq dataset and use these anchors to transfer cell type labels from scRNA-seq to scATAC-seq cells. Visualize the predicted cell types on the t-SNE plot of scATAC-seq data. 
+
+
+#### II.6 [Graduate Students] Create a matrix heatmap of cluster IDs from the Seurat clusters from scATAC data with the predicted celltypes from scRNA-seq. Describe what clusters appears to map 1 to 1 between the modalities and which clusters appear split? (Hint: use the `pbmc@meta.data` data frame and `dplyr::group_by`)
+
+
+#### II.7 [Graduate Students] Using the transferred cell state annotations, find the differential peaks between the two clusters of B-cells (activated and memory). Visualize two of the top accessibility peaks that are different. Are the accessibility peaks visualized restricted to a particular celltype or present in other PBMC celltypes? 
+
+
+#### II.8 [Graduate Students] Perform a motif analysis to identify motifs that are over-represented in the differential peaks between the activated and memory B-cells. Visualize the top two motifs that are differential between the B-cells. 
+
+
+# Part III: GWAS Followup
+
+The NHGRI-EBI GWAS Catalog is a curated dataset of trait-associated genetic variants for human. While it provides association between single-nucleotide polymorphisms (SNPs) and trait (i.e. cancer), the genetic variants in GWAS catalog are not necessarily causative or functional for a trait, since SNPs can be highly correlated measured by linkage disequilibrium (LD). To learn the potential functional effect of a certain SNP, especially the non-coding variants, we can use RegulomeDB to explore the potential function of the SNP.
+
+You will explore the following online resources: The NHGRI-EBI GWAS catalog (https://www.ebi.ac.uk/gwas/), dbSNP (https://www.ncbi.nlm.nih.gov/snp/ ), LDLink (https://ldlink.nci.nih.gov/), and RegulomeDB (the beta version http://regulomedb.org or the more stable older version http://legacy.regulomedb.org/).
+
+#### III.1 Explore whether there are genetic variants within the gene BRCA2 which are associated with any traits. What traits are associated with the BRCA2 variants? Which SNP has the smallest p-value related to breast cancer? What is the risk allele?
+
+
+#### III.2 For the BRCA2 SNP with most significant association with breast cancer, what consequence does the risk allele have on the BRCA2 protein sequence? Based on 1000 Genomes in LDLink, what is the allele frequency of the risk allele among the 5 ethnicities In the population with the highest risk in the resource, what is the expected number of people with heterozygous genotype at this SNP, assuming linkage disequilibrium?
+
+
+#### III.3 Explore a certain SNP, rs4784227, that was reported to be associated with breast cancer. Is it an intergenic, exonic or intronic variant? What gene does it fall in?  
+
+#### III.4 Explore the SNP rs4784227 in RegulomeDB. What functional category does the rank score (or Regulome DB Score) implicate? What factors does RegulomeDB take into consideration while scoring the potential function of SNPs?
+
+
+#### III.5 Describe the evidence that implicate the regulatory potential of rs4784227, for example, list several transcription factors with binding peaks overlapping this SNP; report the cell types with open chromatin regions overlapping this SNP. 
+
+
+#### III.6 [Graduate Students] Read the paper by Cowper-Sal et al. (PMID 23001124) and summarize the potential mechanisms of the above SNP’s function in terms of affecting transcription factor-DNA interaction and regulating genes.
+
+
+# Part IV: COVID19 Genomics
+
+We are currently fighting an epidemic due to the SARS-CoV-2 virus. As more viruses from infected individuals are sequenced, the epidemiology of this pathogen is becoming better understood. Nextstrain (https://nextstrain.org/ncov) is an online resource that aggregates and tracks public sequencing data of the virus. Using screen shots to support your answers, address the following questions related to SARS-CoV-2:
+
+#### IV.1 Determine the main clades of the virus as well as the main nucleotide and protein changes that define the clades. What are the genes associated with each mutation?
+
+
+#### IV.2 Identify the main clade affecting four of the countries most severely affected by SAR-CoV-2: China, United States, Iran, and Italy. 
+
+
+#### IV.3 The countries of Georgia, Democratic Republic of Congo, and Brazil have relatively few (but non-zero!) cases of SARS-CoV-2. Using the Nextstrain data, speculate the most likely countries where the virus was transmitted from. 
+
+
+#### IV.4 The spike protein (S) is currently the target of several therapeutic approaches and vaccines. Understanding which cases have mutated residues of this protein is of considerable importance. For the variant in this protein with the highest minor allele frequency, visualize the proportion of these cases of the virus world-wide. 
+
+
+#### IV.5 [Graduate Students] Preliminary reports from the New England Journal of Medicine (`nejmoa2002032.pdf`) suggest that men may be more susceptible than women. Using the metadata from Nextstrain, evaluate whether you can corroborate this finding. Further, determine whether the clade of the virus differentially affects men or women. Support your answers with statistical analyses.  
+
+
+#### IV.6 [Graduate Students] For each country in the data reported from NextStrain, determine the clade that is responsible for the most cases and the percent of cases (per country).
+
+
