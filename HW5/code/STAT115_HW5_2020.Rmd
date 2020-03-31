@@ -14,19 +14,27 @@ For simplicity, we will only have two hidden states (upstream, downstream), and 
 ```
 Initial probability: upstream = 0.5, downstream = 0.5
 Transition probability: Pb(up to up) = Pb(dn to dn) = 0.9, Pb(up to dn) = Pb(dn to up) = 0.1
-Emission probability: 4% < -1200, 10% [-1200, -600), 20% [-600, -300), 40% [-500, 0), 6% >= 0.
-Upstream: 4% > 1200, 8% (800, 1200], 15% (500, 800], 65% (0, 500), 8% <= 0.
-Downstream: 4% > 1200, 8% (800, 1200], 15% (500, 800], 65% (0, 500), 8% <= 0.
+
+Emission probabilities: 
+P{<-1200, [-1200,-800), [-800,-500), [-500,0), [0,500), [-500,800), [800, 1200), >= 1200 | upstream} = (0.01, 0.01, 0.02, 0.04, 0.65, 0.15, 0.08, 0.04)
+P{<-1200, [-1200,-800), [-800,-500), [-500,0), [0,500), [-500,800), [800, 1200), >= 1200 | downstream} = (0.04, 0.08, 0.15, 0.65, 0.04, 0.02, 0.01, 0.01)
+
 ```
 
-#### I.1 Given the DI file (`HW5_ESC.Dixon_2015.DI.chr21.txt`), implement and utilize the Viterbi algorithm to predict the hidden states of the HiC data. Report the putative TAD boundries from this analysis. 
+#### I.1 Given the DI file (`HW5_ESC.Dixon_2015.DI.chr21.txt`), implement and utilize the Viterbi algorithm to predict the hidden states of the Hi-C data. Visualize your result with a graph utilizing the following: midpoint of genomic bin on the x axis; DI score per bin on the y-axis; color: hidden state of the HMM. 
 
 Hint: Examples HMM code can be found at: 
 http://www.adeveloperdiary.com/data-science/machine-learning/implement-viterbi-algorithm-in-hidden-markov-model-using-python-and-r/
 
 
 ```{r}
-# your code here
+
+data <- read.table("../data/HW5_ESC.Dixon_2015.DI.chr21.txt", col.names = c("chr", "start", "end", "DI"))
+data$mid <- (data$end + data$start)/ 2
+
+# Hint: make discrete states from the continuous directionability index
+obs_states <- cut(data$DI, breaks = c(min(data$DI)-1,-1200, -800, -500, 0, 500, 800, 1200, max(data$DI)+1), right = FALSE) 
+
 ```
 
 # Part II. Single cell ATAC-seq
@@ -46,7 +54,7 @@ For this exercise, we will be analyzing a single cell ATAC-Seq dataset of human 
 #### II.4 Process the peak matrix. a) Perform latent semantic indexing (LSI) to reduce the dimensionality of the scATAC-seq data. Reduce the dimension to 50. b) Run UMAP on the first 20 dimensions but excluding the first component. c) Cluster all the cells using `resolution = 0.6` and visualize these clusters on a UMAP embedding. Comment on why we recommended excluding the first LSI component.
 
 
-#### II.5 Read the pre-processed and clustered scRNA-seq dataset, which is provided as part of the homework and was generated for the lab. Then identify anchors between the scATAC-seq dataset and the scRNA-seq dataset and use these anchors to transfer cell type labels from scRNA-seq to scATAC-seq cells. Visualize the predicted cell types on the t-SNE plot of scATAC-seq data. 
+#### II.5 Read the pre-processed and clustered scRNA-seq dataset, which is provided as part of the homework and was generated for the lab. Then identify anchors between the scATAC-seq dataset and the scRNA-seq dataset and use these anchors to transfer cell type labels from scRNA-seq to scATAC-seq cells. Visualize the predicted cell types on the UMAP plot of scATAC-seq data. 
 
 
 #### II.6 [Graduate Students] Create a matrix heatmap of cluster IDs from the Seurat clusters from scATAC data with the predicted celltypes from scRNA-seq. Describe what clusters appears to map 1 to 1 between the modalities and which clusters appear split? (Hint: use the `pbmc@meta.data` data frame and `dplyr::group_by`)
