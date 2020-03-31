@@ -54,7 +54,7 @@ For this exercise, we will be analyzing a single cell ATAC-Seq dataset of human 
 #### II.4 Process the peak matrix. a) Perform latent semantic indexing (LSI) to reduce the dimensionality of the scATAC-seq data. Reduce the dimension to 50. b) Run UMAP on the first 20 dimensions but excluding the first component. c) Cluster all the cells using `resolution = 0.6` and visualize these clusters on a UMAP embedding. Comment on why we recommended excluding the first LSI component.
 
 
-#### II.5 Read the pre-processed and clustered scRNA-seq dataset, which is provided as part of the homework and was generated for the lab. Then identify anchors between the scATAC-seq dataset and the scRNA-seq dataset and use these anchors to transfer cell type labels from scRNA-seq to scATAC-seq cells. Visualize the predicted cell types on the UMAP plot of scATAC-seq data. 
+#### II.5 Read in the pre-processed and clustered scRNA-seq dataset, which is provided as part of the homework and was generated for the lab exercise. Then identify anchors between the scATAC-seq dataset and the scRNA-seq dataset and use these anchors to transfer cell type labels from scRNA-seq to scATAC-seq cells. Visualize the predicted cell types on the UMAP plot of scATAC-seq data. 
 
 
 #### II.6 [Graduate Students] Create a matrix heatmap of cluster IDs from the Seurat clusters from scATAC data with the predicted celltypes from scRNA-seq. Describe what clusters appears to map 1 to 1 between the modalities and which clusters appear split? (Hint: use the `pbmc@meta.data` data frame and `dplyr::group_by`)
